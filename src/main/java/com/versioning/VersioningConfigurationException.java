@@ -1,4 +1,4 @@
-package com.versioning.model;
+package com.versioning;
 
 public class VersioningConfigurationException extends Exception {
 

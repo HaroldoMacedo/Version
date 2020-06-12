@@ -4,7 +4,7 @@ import com.versioning.entity.Entity;
 
 /**
  * 
- * @author Haroldo Macêdo
+ * @author Haroldo MacÃªdo
  *
  */
 class FromToVersions {
