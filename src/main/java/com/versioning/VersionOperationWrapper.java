@@ -1,13 +1,12 @@
-package com.versioning.model;
+package com.versioning;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.NoSuchElementException;
 
-import com.versioning.VersioningConfigurationException;
 import com.versioning.entity.Entity;
 import com.versioning.entity.VersionEntity;
-import com.versioning.map.MapEntityVersion;
+import com.versioning.model.ExecuteOperationVersion;
+import com.versioning.model.ExecuteVersion;
 
 /**
  * Wraps the execution of an operation by deciding which version to call.
@@ -17,7 +16,7 @@ import com.versioning.map.MapEntityVersion;
  * @author Haroldo Macêdo
  *
  */
-public class OperationVersionWrapper  {
+class VersionOperationWrapper implements VersionExecuter {
 
   private ExecuteVersion executerVersionAnnoations;
   private ExecuteOperationVersion executeOperationVersion;
@@ -28,7 +27,7 @@ public class OperationVersionWrapper  {
    * @param executeOperationVersion
    * @param returnEntityClass
    */
-  public OperationVersionWrapper(ExecuteOperationVersion executeOperationVersion) throws VersioningConfigurationException {
+  VersionOperationWrapper(ExecuteOperationVersion executeOperationVersion) throws VersioningConfigurationException {
     this.executeOperationVersion = executeOperationVersion;
     this.executerVersionAnnoations = getMethodAnnotations(executeOperationVersion.getClass());
   }
@@ -38,6 +37,7 @@ public class OperationVersionWrapper  {
    * Maps the input object before calling the operation.
    * Maps the operation output to the return object version expected by the caller.  
    */
+  @Override
   public Entity execute(Entity entity, Class<? extends Entity> returnEntityClass) throws VersioningConfigurationException {
 
     VersionEntity inputEntityVersionAnnotations = getClassAnnotations(entity.getClass());
@@ -71,7 +71,7 @@ public class OperationVersionWrapper  {
           .filter(p -> p instanceof ExecuteVersion)
           .findFirst()
           .get();
-    } catch (NoSuchMethodException e) {
+    } catch (Exception e) {
       throw new VersioningConfigurationException("Annotation for method 'execute()' of " + executerClass.getName() + " is not defined.");
     }
     
@@ -93,7 +93,7 @@ public class OperationVersionWrapper  {
           .findFirst().get();
 
       return entityVersionAnnotations;
-    } catch (NoSuchElementException e) {
+    } catch (Exception e) {
       throw new VersioningConfigurationException("Annotation for class " + entity.getName() + " is not defined.");
     }
   }

@@ -1,4 +1,4 @@
-package com.versioning.map;
+package com.versioning;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -7,22 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import com.versioning.VersioningConfigurationException;
 import com.versioning.entity.Entity;
 import com.versioning.entity.VersionEntity;
+import com.versioning.map.EntityVersion;
+import com.versioning.map.EntityVersionMapper;
 import com.versioning.model.ExecuteVersion;
 import com.versioning.model.VersionPath;
 
-public class MapEntityVersion {
+class MapEntityVersion {
 
-  static {
-    System.out.println("   ---- Carregando classe MapEntityVersion ----");
-    entities = new HashMap<>();
-  }
-  
   //
   //  Entities. Main object of this class. Contains the whole version framework structure.
-  private static final Map<String, VersionPath> entities;
+  //
+  private static final Map<String, VersionPath> entities = new HashMap<>();;
 
   /**
    * Execute a map for a request call on the entity {entity} version {versionInput} to the version {executeVersion}
@@ -31,8 +28,9 @@ public class MapEntityVersion {
    * @param versionInput - Version of the input entity.
    * @param executeVersion - Version of the input entity on the executable object.
    * @return Entity transformed to the executable version.
+   * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
-  public static Entity mapRequest(Entity entity, VersionEntity versionInput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
+  static Entity mapRequest(Entity entity, VersionEntity versionInput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
     System.out.println("Mapping request of entity '" + versionInput.name() + "' from version " + versionInput.version() + " to version " + executeVersion.inputVersion() + ".");
     
     //  Don't know how to map different entities.
@@ -52,8 +50,9 @@ public class MapEntityVersion {
    * @param versionOutput - Version of the returned entity
    * @param executeVersion - Version returned by the executable object.
    * @return Entity transformed from the return of the executable version to the expected {versionOutput} version.
+   * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
-  public static Entity mapResponse(Entity entity, VersionEntity versionOutput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
+  static Entity mapResponse(Entity entity, VersionEntity versionOutput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
     System.out.println("Mapping response of entity '" + versionOutput.name() + "' from version " + executeVersion.outputVersion() + " to version " + versionOutput.version() + ".");
 
     //  Don't know how to map different entities.
@@ -67,14 +66,14 @@ public class MapEntityVersion {
   }
   
   /**
-   * Do the map (either request or response.
+   * Do the map, either request or response.
    * 
-   * @param entity
-   * @param entityName
-   * @param fromVersion
-   * @param toVersion
-   * @return
-   * @throws VersioningConfigurationException
+   * @param entity - Entity to map from version version {executeVersion} to the version {versionOutput}.
+   * @param entityName - Name of the entity to map.
+   * @param fromVersion - Initial version.
+   * @param toVersion - Final version.
+   * @return - Entity mapped to the final version.
+   * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
   private static Entity map(Entity entity, String entityName, int fromVersion, int toVersion) throws VersioningConfigurationException {
     //  Same version, no mapping needed.
@@ -103,7 +102,7 @@ public class MapEntityVersion {
    * 
    * @param entityVersionMappers - A list of entityVersionMappers to register.
    */
-  public static void registerMappers(EntityVersionMapper... entityVersionMappers) {
+  static void registerMappers(EntityVersionMapper... entityVersionMappers) {
     System.out.println("Registering entity mappers");
     for (EntityVersionMapper entityVersionMapper : entityVersionMappers) {
         addVersionMapper(entityVersionMapper);
@@ -111,7 +110,13 @@ public class MapEntityVersion {
     System.out.println("Registration done");
   }
   
+  /**
+   * Adds one entity mapper to the framework.
+   * 
+   * @param entityVersionMapper - Entity mapper that knwos how to transform entity from version {fromVersion} to {toVersion}.
+   */
   private static void addVersionMapper(EntityVersionMapper entityVersionMapper) {
+    //  Get the annotations of the entityVersionMapper.
     EntityVersion versionMapper;
     try {
       versionMapper = getMethodAnnotations(entityVersionMapper.getClass());
@@ -120,34 +125,40 @@ public class MapEntityVersion {
       return;
     }
     
+    //  Validate version numbers.
     if (versionMapper.fromVersion() <= 0 || versionMapper.toVersion() <= 0) {
       System.out.println("Invalid version number of entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version "
           + versionMapper.toVersion() + ". Versions start in 1. Registration ignored.");
       return;
     }
 
-    // Versions validation.
+    // No mapping for same versions.
     if (versionMapper.fromVersion() == versionMapper.toVersion()) {
       System.out.println("Ignoring same version maping of entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version " + versionMapper.toVersion() + ".");
       return;
     }
-    
 
-    System.out.println("\tMap entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version " + versionMapper.toVersion());
-    //  Find existing fromTo object of this entity.
+    //  Get the entity this mapping maps.
     VersionPath versionPath = entities.get(versionMapper.entityName());
     // If entityVersionMap doesn't exist, create one and store in {entities}.
     if (versionPath == null) {
+      //  First time, create and store entity.
       versionPath = new VersionPath();
       entities.put(versionMapper.entityName(), versionPath);
     }
 
-    //  
+    //  Register entity mapper.
+    System.out.println("\tMap entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version " + versionMapper.toVersion());
     versionPath.add(entityVersionMapper, versionMapper.fromVersion(), versionMapper.toVersion());
   }
 
-
-
+  /**
+   * Read the annotations of a EntityVersionMapper method.
+   * 
+   * @param mapperClass
+   * @return
+   * @throws VersioningConfigurationException
+   */
   private static EntityVersion getMethodAnnotations(Class<? extends EntityVersionMapper> mapperClass) throws VersioningConfigurationException {
     EntityVersion versionMapper;
     try {
