@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.versioning.entity.Entity;
 import com.versioning.entity.VersionEntity;
 import com.versioning.map.EntityVersion;
@@ -37,8 +34,6 @@ import com.versioning.model.ExecuteVersion;
  */
 class MapEntityVersion {
 
-  private static Logger logger = LogManager.getFormatterLogger(MapEntityVersion.class.getName());
-
   /**
    * Main object of this framework.
    * Contains the all the version transformation objects for each entity name.
@@ -57,7 +52,7 @@ class MapEntityVersion {
    * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
   static Entity mapRequest(Entity entity, VersionEntity versionInput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
-    logger.info("Mapping request of entity '%s' from version %d to version %d.", versionInput.name(), versionInput.version(), executeVersion.inputVersion());
+    System.out.println("Mapping request of entity '" + versionInput.name() + "' from version " + versionInput.version() + " to version " + executeVersion.inputVersion() + ".");
     
     //  Don't know how to map different entities.
     if (!versionInput.name().equals(executeVersion.inputEntity()))
@@ -82,7 +77,7 @@ class MapEntityVersion {
    * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
   static Entity mapResponse(Entity entity, VersionEntity versionOutput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
-    logger.info("Mapping response of entity '%s' from version %d to version %d.", versionOutput.name(), executeVersion.outputVersion(), versionOutput.version());
+    System.out.println("Mapping response of entity '" + versionOutput.name() + "' from version " + executeVersion.outputVersion() + " to version " + versionOutput.version() + ".");
 
     //  Don't know how to map different entities.
     if (!versionOutput.name().equals(executeVersion.outputEntity()))
@@ -156,15 +151,14 @@ class MapEntityVersion {
     
     //  Validate version numbers.
     if (versionMapper.fromVersion() <= 0 || versionMapper.toVersion() <= 0) {
-      logger.warn("Invalid version number of entity '%s'\tfrom version %d to version %d. Versions start in 1. Registration ignored.", 
-          versionMapper.entityName(), versionMapper.fromVersion(), versionMapper.toVersion());
+      System.out.println("Invalid version number of entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version "
+          + versionMapper.toVersion() + ". Versions start in 1. Registration ignored.");
       return;
     }
 
     // No mapping for same versions.
     if (versionMapper.fromVersion() == versionMapper.toVersion()) {
-      logger.warn("Ignoring same version maping of entity '%s'\tfrom version %d to version %d.", 
-          versionMapper.entityName(), versionMapper.fromVersion(), versionMapper.toVersion());
+      System.out.println("Ignoring same version maping of entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version " + versionMapper.toVersion() + ".");
       return;
     }
 
@@ -178,8 +172,7 @@ class MapEntityVersion {
     }
 
     //  Register entity mapper.
-    logger.debug("\tMap entity '%s'\tfrom version %d to version %d", 
-        versionMapper.entityName(), versionMapper.fromVersion(), versionMapper.toVersion());
+    System.out.println("\tMap entity '" + versionMapper.entityName() + "'\tfrom version " + versionMapper.fromVersion() + " to version " + versionMapper.toVersion());
     versionPath.add(entityVersionMapper, versionMapper.fromVersion(), versionMapper.toVersion());
   }
 

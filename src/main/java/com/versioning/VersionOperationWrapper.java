@@ -3,9 +3,6 @@ package com.versioning;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.versioning.entity.Entity;
 import com.versioning.entity.VersionEntity;
 import com.versioning.model.ExecuteOperationVersion;
@@ -21,8 +18,6 @@ import com.versioning.model.ExecuteVersion;
  */
 class VersionOperationWrapper implements VersionExecuter {
 
-  private static Logger logger = LogManager.getFormatterLogger(VersionOperationWrapper.class.getName());
-  
   private ExecuteVersion executerVersionAnnoations;
   private ExecuteOperationVersion executeOperationVersion;
 
@@ -50,10 +45,6 @@ class VersionOperationWrapper implements VersionExecuter {
     VersionEntity inputEntityVersionAnnotations = getClassAnnotations(entity.getClass());
     VersionEntity outputEntityVersionAnnotations = getClassAnnotations(returnEntityClass);
 
-    logger.debug("Executing %s: Input is entity %s v%d. Output is entity %s v%d", executeOperationVersion.getClass().getName(), 
-        inputEntityVersionAnnotations.name(), inputEntityVersionAnnotations.version(),
-        outputEntityVersionAnnotations.name(), outputEntityVersionAnnotations.version());
-    
     // Map Input
     Entity entityIn = MapEntityVersion.mapRequest(entity, inputEntityVersionAnnotations, executerVersionAnnoations);
 
@@ -63,7 +54,6 @@ class VersionOperationWrapper implements VersionExecuter {
     // Map Output
     Entity entityRet = MapEntityVersion.mapResponse(entityOut, outputEntityVersionAnnotations, executerVersionAnnoations);
 
-    logger.debug("Executed %s", executeOperationVersion.getClass().getName()); 
     return entityRet;
   }
 
