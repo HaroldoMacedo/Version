@@ -33,9 +33,11 @@ class VersionOperationWrapper implements VersionExecuter {
   }
 
   /**
-   * Execute the actual operation version.
-   * Maps the input object before calling the operation.
-   * Maps the operation output to the return object version expected by the caller.  
+   * Execute the actual operation by transforming the input entity version, calling the executer and 
+   * transforming back to the expected returned entity version.<br>
+   * <ul><li>Maps the input object before calling the operation.</li>
+   * <li>Executes the operation.</li>
+   * <li>Maps the operation output to the return entity version expected by the caller.</li></ul>  
    */
   @Override
   public Entity execute(Entity entity, Class<? extends Entity> returnEntityClass) throws VersioningConfigurationException {

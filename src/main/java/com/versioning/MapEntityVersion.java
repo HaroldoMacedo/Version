@@ -12,17 +12,38 @@ import com.versioning.entity.VersionEntity;
 import com.versioning.map.EntityVersion;
 import com.versioning.map.EntityVersionMapper;
 import com.versioning.model.ExecuteVersion;
-import com.versioning.model.VersionPath;
 
+/**
+ * Class that manages all entities versions available.<br>
+ * It is done by storing every {@link com.versioning.map.EntityVersionMapper EntityVersionMapper} object and
+ * implementing an algorithm to return a list of entity mappers to be executed in order
+ * to transform an entity from the initial version to the final version, 
+ * and executing any intermediary version transformation that may be needed.<br><br>
+ * Method {@link #registerMappers(EntityVersionMapper...) registerMappers()} must be called to
+ * store (or register) the entities mappers {@link com.versioning.map.EntityVersionMapper EntityVersionMapper}.<br><br>
+ * Later, a call to 
+ * {@link #mapRequest(Entity, VersionEntity, ExecuteVersion) mapRequest()} or 
+ * {@link #mapResponse(Entity, VersionEntity, ExecuteVersion) mapResponse()}
+ * triggers the chain of execution to transform the version of the 
+ * {@link com.versioning.entity.Entity Entity} passed as a parameter to the 
+ * version accepted by the actual business execution class described by 
+ * {@link com.versioning.model.ExecuteVersion ExecuteVersion}.
+ * 
+ * @author Haroldo Macêdo
+ *
+ */
 class MapEntityVersion {
 
-  //
-  //  Entities. Main object of this class. Contains the whole version framework structure.
-  //
-  private static final Map<String, VersionPath> entities = new HashMap<>();;
+  /**
+   * Main object of this framework.
+   * Contains the all the version transformation objects for each entity name.
+   */
+  private static final Map<String, VersionPath> entities = new HashMap<>();
 
   /**
-   * Execute a map for a request call on the entity {entity} version {versionInput} to the version {executeVersion}
+   * Transform the version of an {@link com.versioning.entity.Entity Entity} received in this request 
+   * to the version accepted by the business executable object described by the 
+   * {@link com.versioning.model.ExecuteVersion ExecuteVersion}.
    *  
    * @param entity - Entity to map from version {versionInput} to the version {executeVersion}.
    * @param versionInput - Version of the input entity.
@@ -44,7 +65,10 @@ class MapEntityVersion {
   }
   
   /**
-   * Execute a map for a response on the entity {entity} version {executeVersion} to the version {versionOutput}
+   * Transform the {@link com.versioning.entity.Entity Entity} version returned 
+   * by the executable object described by 
+   * {@link com.versioning.model.ExecuteVersion ExecuteVersion} to an {@link com.versioning.entity.Entity Entity} 
+   * version that is accepted as the returned value of this response.
    * 
    * @param entity - Entity to map from version version {executeVersion} to the version {versionOutput}.
    * @param versionOutput - Version of the returned entity
