@@ -3,6 +3,9 @@ package com.versioning;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.versioning.entity.Entity;
 import com.versioning.map.EntityVersionMapper;
 
@@ -17,6 +20,7 @@ import com.versioning.map.EntityVersionMapper;
  *
  */
 class VersionPath {
+  private static Logger logger = LogManager.getFormatterLogger(VersionPath.class.getName());
 
   private static final int MAXVERSIONS = 100;
   /**
@@ -33,12 +37,12 @@ class VersionPath {
    */
   void add(EntityVersionMapper mapper, int fromVersion, int toVersion){
     if (notInRange(fromVersion) || notInRange(toVersion)) {
-      System.out.println("Versioning " + fromVersion + " to version " + toVersion + " out of range. Version number range from 1 to 99.");
+      logger.warn("Versioning %d to version %d out of range. Version number range from 1 to 99.", fromVersion, toVersion);
       return;
     }
     
     if (tableMap[fromVersion][toVersion] != null) {
-      System.out.println("Mapping from version " + fromVersion + " to version " + toVersion + " already exists.");
+      logger.warn("Mapping from version %d to version %d  already exists.", fromVersion, toVersion);
       return;
     }
     
