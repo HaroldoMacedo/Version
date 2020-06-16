@@ -1,2 +1,2 @@
 # Versioning
-Version framework and sample.
+Version framework.
