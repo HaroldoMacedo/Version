@@ -6,9 +6,8 @@ Framework designed and implemented to act as the interceptor to the REST service
 
 The interceptor transform input object version, received from the client request, to an object version that is currently used by the executable code. And, also, it transform the object version returned from the executable code, to a response object version that is accepted by the client.
 
-<p align="center">
- <img src="https://github.com/HaroldoMacedo/Version/blob/master/images/Interceptor.PNG">
-</p>
+<img align="center" width="600" height="314" src="https://github.com/HaroldoMacedo/Version/blob/master/images/Interceptor.PNG" >
+
 # Goals
 * Create a versioning framework that are simple to use, easily evolvable and reliable
 * Implemented using the SOLID principles
