@@ -11,8 +11,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.versioning.entity.Entity;
-import com.versioning.entity.VersionEntity;
-import com.versioning.map.EntityVersion;
+import com.versioning.entity.EntityVersion;
+import com.versioning.map.EntityVersionMap;
 import com.versioning.map.EntityVersionMapper;
 import com.versioning.model.ExecuteVersion;
 
@@ -25,8 +25,8 @@ import com.versioning.model.ExecuteVersion;
  * Method {@link #registerMappers(EntityVersionMapper...) registerMappers()} must be called to
  * store (or register) the entities mappers {@link com.versioning.map.EntityVersionMapper EntityVersionMapper}.<br><br>
  * Later, a call to 
- * {@link #mapRequest(Entity, VersionEntity, ExecuteVersion) mapRequest()} or 
- * {@link #mapResponse(Entity, VersionEntity, ExecuteVersion) mapResponse()}
+ * {@link #mapRequest(Entity, EntityVersion, ExecuteVersion) mapRequest()} or 
+ * {@link #mapResponse(Entity, EntityVersion, ExecuteVersion) mapResponse()}
  * triggers the chain of execution to transform the version of the 
  * {@link com.versioning.entity.Entity Entity} passed as a parameter to the 
  * version accepted by the actual business execution class described by 
@@ -56,7 +56,7 @@ class MapEntityVersion {
    * @return Entity transformed to the executable version.
    * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
-  static Entity mapRequest(Entity entity, VersionEntity versionInput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
+  static Entity mapRequest(Entity entity, EntityVersion versionInput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
     logger.info("Mapping request of entity '%s' from version %d to version %d.", versionInput.name(), versionInput.version(), executeVersion.inputVersion());
     
     //  Don't know how to map different entities.
@@ -81,7 +81,7 @@ class MapEntityVersion {
    * @return Entity transformed from the return of the executable version to the expected {versionOutput} version.
    * @throws VersioningConfigurationException - If some configuration error is found, such as lack of annotations.
    */
-  static Entity mapResponse(Entity entity, VersionEntity versionOutput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
+  static Entity mapResponse(Entity entity, EntityVersion versionOutput, ExecuteVersion executeVersion) throws VersioningConfigurationException {
     logger.info("Mapping response of entity '%s' from version %d to version %d.", versionOutput.name(), executeVersion.outputVersion(), versionOutput.version());
 
     //  Don't know how to map different entities.
@@ -146,7 +146,7 @@ class MapEntityVersion {
    */
   private static void addVersionMapper(EntityVersionMapper entityVersionMapper) {
     //  Get the annotations of the entityVersionMapper.
-    EntityVersion versionMapper;
+    EntityVersionMap versionMapper;
     try {
       versionMapper = getMethodAnnotations(entityVersionMapper.getClass());
     } catch (VersioningConfigurationException e) {
@@ -190,14 +190,14 @@ class MapEntityVersion {
    * @return
    * @throws VersioningConfigurationException
    */
-  private static EntityVersion getMethodAnnotations(Class<? extends EntityVersionMapper> mapperClass) throws VersioningConfigurationException {
-    EntityVersion versionMapper;
+  private static EntityVersionMap getMethodAnnotations(Class<? extends EntityVersionMapper> mapperClass) throws VersioningConfigurationException {
+    EntityVersionMap versionMapper;
     try {
       Method method = mapperClass.getMethod("map", new Class[] { Entity.class });
-      versionMapper = (EntityVersion)Arrays
+      versionMapper = (EntityVersionMap)Arrays
           .asList(method.getAnnotations())
           .stream()
-          .filter(p -> p instanceof EntityVersion)
+          .filter(p -> p instanceof EntityVersionMap)
           .findFirst()
           .get();
     } catch (NoSuchMethodException | NoSuchElementException e) {

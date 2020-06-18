@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RUNTIME)
 @Target(METHOD)
-public @interface EntityVersion {
+public @interface EntityVersionMap {
   String entityName();
   int fromVersion();
   int toVersion();

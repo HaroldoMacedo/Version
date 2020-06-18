@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.versioning.entity.Entity;
-import com.versioning.entity.VersionEntity;
+import com.versioning.entity.EntityVersion;
 import com.versioning.model.ExecuteOperationVersion;
 import com.versioning.model.ExecuteVersion;
 
@@ -47,8 +47,8 @@ class VersionOperationWrapper implements VersionExecuter {
   @Override
   public Entity execute(Entity entity, Class<? extends Entity> returnEntityClass) throws VersioningConfigurationException {
 
-    VersionEntity inputEntityVersionAnnotations = getClassAnnotations(entity.getClass());
-    VersionEntity outputEntityVersionAnnotations = getClassAnnotations(returnEntityClass);
+    EntityVersion inputEntityVersionAnnotations = getClassAnnotations(entity.getClass());
+    EntityVersion outputEntityVersionAnnotations = getClassAnnotations(returnEntityClass);
 
     logger.debug("Executing %s: Input is entity %s v%d. Output is entity %s v%d", executeOperationVersion.getClass().getName(), 
         inputEntityVersionAnnotations.name(), inputEntityVersionAnnotations.version(),
@@ -96,12 +96,12 @@ class VersionOperationWrapper implements VersionExecuter {
    * @param entity
    * @return
    */
-  private VersionEntity getClassAnnotations(Class<? extends Entity> entity) throws VersioningConfigurationException {
+  private EntityVersion getClassAnnotations(Class<? extends Entity> entity) throws VersioningConfigurationException {
     try {
-      VersionEntity entityVersionAnnotations = (VersionEntity) Arrays
+      EntityVersion entityVersionAnnotations = (EntityVersion) Arrays
           .asList(entity.getAnnotations())
           .stream()
-          .filter(p -> p instanceof VersionEntity)
+          .filter(p -> p instanceof EntityVersion)
           .findFirst().get();
 
       return entityVersionAnnotations;
