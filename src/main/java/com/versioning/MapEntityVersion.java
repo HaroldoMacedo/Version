@@ -114,14 +114,16 @@ class MapEntityVersion {
     if (versionPath == null)
       throw new VersioningConfigurationException("No class to map entity '" + entityName + "' from version " + fromVersion + " to version " + toVersion);
     List<EntityVersionMapper> mappers = versionPath.getMappingPath(fromVersion, toVersion);
+    if (mappers == null)
+      throw new VersioningConfigurationException("No mapping was found to map entity '" + entityName + "' from version " + fromVersion + " to version " + toVersion);
 
     //  Execute all mappers.
     Entity entityReturn = entity;
     for (EntityVersionMapper evm : mappers) {
-      System.out.println(" - " + evm.getClass().getName());
+      logger.debug(" - %s", evm.getClass().getName());
       entityReturn = evm.map(entityReturn);
     }
-    System.out.println("Mapping End");
+    logger.debug("Mapping End");
     
     return entityReturn;
   }
@@ -132,11 +134,11 @@ class MapEntityVersion {
    * @param entityVersionMappers - A list of entityVersionMappers to register.
    */
   static void registerMappers(EntityVersionMapper... entityVersionMappers) {
-    System.out.println("Registering entity mappers");
+    logger.debug("Registering entity mappers");
     for (EntityVersionMapper entityVersionMapper : entityVersionMappers) {
         addVersionMapper(entityVersionMapper);
     }
-    System.out.println("Registration done");
+    logger.debug("Registration done");
   }
   
   /**

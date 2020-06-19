@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.versioning.map.EntityVersionMapper;
+import com.versioning.model.ExecuteOperationVersion;
 
 /**
  * Register the {@link com.versioning.map.EntityVersionMapper EntityVersionMapper} objects in the framework.<br>
@@ -22,4 +23,7 @@ public abstract class VersionConfigure {
     logger.debug("Entity Version Mappers Registered");
   }  
 
+  public static VersionExecuter get(ExecuteOperationVersion executer) throws VersioningConfigurationException {
+	    return new VersionOperationWrapper(executer);
+	  }
 }
